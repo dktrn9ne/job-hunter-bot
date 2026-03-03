@@ -1,6 +1,7 @@
 import { IngestForm } from "./components/IngestForm";
 
 import { TailorButton } from "./components/TailorButton";
+import { DocLinks } from "./components/DocLinks";
 
 type JobRow = {
   id: string;
@@ -71,7 +72,7 @@ export default async function Home() {
                 <th className="p-3">Score</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Created</th>
-                <th className="p-3">Actions</th>
+                <th className="p-3">Actions / Docs</th>
               </tr>
             </thead>
             <tbody>
@@ -105,11 +106,17 @@ export default async function Home() {
                       {new Date(j.created_at).toLocaleString()}
                     </td>
                     <td className="p-3 whitespace-nowrap">
-                      <TailorButton
-                        jobId={j.id}
-                        base={(j.base_resume ?? "marketing") as any}
-                        track={(j.track ?? undefined) as any}
-                      />
+                      <div className="flex flex-col gap-2">
+                        <TailorButton
+                          jobId={j.id}
+                          base={(j.base_resume ?? "marketing") as any}
+                          track={(j.track ?? undefined) as any}
+                        />
+                        <DocLinks
+                          jobId={j.id}
+                          base={(j.base_resume ?? "marketing") as any}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))

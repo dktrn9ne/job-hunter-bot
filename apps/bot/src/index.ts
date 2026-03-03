@@ -268,6 +268,38 @@ app.get('/jobs', (req, res) => {
   res.json({ ok: true, jobs: rows });
 });
 
+app.get('/jobs/:id/docs/:kind', (req, res) => {
+  if (!requireAuth(req, res)) return;
+  const jobId = req.params.id;
+  const kind = req.params.kind;
+
+  const doc = db
+    .prepare('SELECT * FROM documents WHERE job_id=? ORDER BY created_at DESC LIMIT 1')
+    .get(jobId) as any;
+  if (!doc) return res.status(404).send('no_documents');
+
+  const map: Record<string, string> = {
+    'cover.html': doc.cover_html_path,
+    'cover.pdf': doc.cover_pdf_path,
+    'resume_music.html': doc.resume_html_path,
+    'resume_music.pdf': doc.resume_pdf_path,
+    'resume_tech.html': doc.resume_html_path,
+    'resume_tech.pdf': doc.resume_pdf_path,
+    'resume_marketing.html': doc.resume_html_path,
+    'resume_marketing.pdf': doc.resume_pdf_path
+  };
+
+  const filePath = map[kind] || '';
+  if (!filePath || !fs.existsSync(filePath)) return res.status(404).send('doc_not_found');
+
+  if (kind.endsWith('.pdf')) res.type('application/pdf');
+  else if (kind.endsWith('.html')) res.type('text/html');
+  else res.type('application/octet-stream');
+
+  return res.sendFile(filePath);
+});
+
+
 app.listen(env.PORT, '127.0.0.1', () => {
   // eslint-disable-next-line no-console
   console.log(`job-hunter-bot listening on http://127.0.0.1:${env.PORT}`);
