@@ -1,0 +1,25 @@
+{
+  "candidate": {
+    "name": "Maurice Thomas",
+    "email": "mrthomaslmg@gmail.com",
+    "phone": "(737) 497-1806",
+    "location": "Austin, TX",
+    "links": [
+      {"label": "LinkedIn", "url": "https://www.linkedin.com/in/mrt45"},
+      {"label": "Press", "url": "https://www.thehypemagazine.com/2017/08/25/five-questions-with-dktr-n9ne/"}
+    ]
+  },
+  "skills": {
+    "Marketing": ["Campaign execution", "Content distribution", "Brand storytelling"],
+    "Media": ["Press/interviews", "Writing"],
+    "Production": ["Project coordination", "Deadlines"]
+  },
+  "roles": [
+    {"key": "orange_line", "company": "Orange Line Media", "title": "Marketing / Campaigns", "location": "Central Texas", "start": "2016", "end": "2020"},
+    {"key": "recognition", "company": "City of Austin", "title": "Proclamation", "location": "Austin, TX", "start": "2018", "end": "2018"}
+  ],
+  "bullets": [
+    {"id": "mus_pub_1", "roleKey": "orange_line", "text": "Published writing in outlets including The FADER and Do512; supported distribution and audience engagement.", "tags": ["writing", "distribution"]},
+    {"id": "mus_rec_1", "roleKey": "recognition", "text": "City of Austin Proclamation: \"DKTR N9NE Day\" (Feb 6, 2018).", "tags": ["recognition"]}
+  ]
+}

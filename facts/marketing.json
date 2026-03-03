@@ -1,0 +1,42 @@
+{
+  "candidate": {
+    "name": "Maurice Thomas",
+    "email": "mrthomaslmg@gmail.com",
+    "phone": "(737) 497-1806",
+    "location": "Austin, TX",
+    "links": [
+      {"label": "LinkedIn", "url": "https://www.linkedin.com/in/mrt45"},
+      {"label": "GitHub", "url": "https://github.com/dktrn9ne"}
+    ]
+  },
+  "skills": {
+    "Paid Media": ["Meta Ads", "Google Ads", "YouTube"],
+    "Retargeting": ["Meta Pixel", "Lookalike audiences"],
+    "Web": ["WordPress", "Shopify"],
+    "CRM": ["HubSpot"],
+    "Content": ["Copywriting", "Editing", "Campaign messaging"],
+    "Analytics": ["KPI reporting (sales/traffic/engagement)"]
+  },
+  "roles": [
+    {"key": "orange_line", "company": "Orange Line Media", "title": "Marketing / Campaigns", "location": "Central Texas", "start": "2016", "end": "2020"},
+    {"key": "lamorne", "company": "Lamorne Morris", "title": "Video Marketing Campaign (\"33 Savage\")", "location": "", "start": "2017", "end": "2017"},
+    {"key": "meta_ads_policy", "company": "Meta (Facebook)", "title": "Ads Policy Advisor", "location": "Austin, TX / Remote", "start": "2016", "end": "2018"},
+    {"key": "cheri_media", "company": "Cheri Media (HipHopDX)", "title": "Intern / Staff Writer", "location": "", "start": "2014", "end": "2015"},
+    {"key": "library_labs", "company": "Library Labs", "title": "AI Media / Automation / Software Development", "location": "Remote", "start": "2023", "end": "Present"}
+  ],
+  "bullets": [
+    {"id": "mkt_orange_1", "roleKey": "orange_line", "text": "Executed multi-channel marketing campaigns: messaging, creative coordination, publishing cadence, and KPI tracking (sales, traffic, engagement).", "tags": ["campaigns", "messaging", "reporting"]},
+    {"id": "mkt_orange_2", "roleKey": "orange_line", "text": "Managed annual marketing budgets in the $40K–$100K range; planned allocation and tracked outcomes.", "tags": ["budget", "forecasting"]},
+    {"id": "mkt_orange_3", "roleKey": "orange_line", "text": "Ran performance marketing initiatives using Meta Ads and Google Ads including retargeting (Meta Pixel) and lookalike audience strategy.", "tags": ["meta_ads", "google_ads", "retargeting"]},
+    {"id": "mkt_orange_4", "roleKey": "orange_line", "text": "Supported marketing for \"History of Gangster Rap\" (Soren Baker), an Amazon Best Seller (launch execution + promotion).", "tags": ["launch", "books", "results"]},
+
+    {"id": "mkt_lamorne_1", "roleKey": "lamorne", "text": "Executed promotional strategy and distribution for a YouTube campaign reaching 4.1M+ views; supported subscriber growth and engagement.", "tags": ["youtube", "distribution", "metrics"], "metrics": {"views": 4100000}},
+
+    {"id": "mkt_meta_1", "roleKey": "meta_ads_policy", "text": "Supported advertising policy and ad operations workflows including issue triage/escalations, documentation, and cross-functional coordination.", "tags": ["ops", "documentation", "stakeholders"]},
+    {"id": "mkt_meta_2", "roleKey": "meta_ads_policy", "text": "Used ad testing credits to validate creative/targeting approaches and troubleshoot delivery issues; translated findings into clear guidance.", "tags": ["testing", "analysis", "communication"]},
+
+    {"id": "mkt_cheri_1", "roleKey": "cheri_media", "text": "Wrote and edited content on deadline; supported publishing cadence and editorial workflows.", "tags": ["writing", "editing", "deadlines"]},
+
+    {"id": "mkt_labs_1", "roleKey": "library_labs", "text": "Built and automated production workflows; improved repeatability and reduced manual overhead.", "tags": ["automation", "process"]}
+  ]
+}

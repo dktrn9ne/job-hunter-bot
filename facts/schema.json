@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JobHunterFactBank",
+  "type": "object",
+  "required": ["candidate", "roles", "skills", "bullets"],
+  "properties": {
+    "candidate": {
+      "type": "object",
+      "required": ["name", "email", "phone", "location"],
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "phone": {"type": "string"},
+        "location": {"type": "string"},
+        "links": {"type": "array", "items": {"type": "object", "properties": {"label": {"type": "string"}, "url": {"type": "string"}}}}
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {"type": "string"}
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "company", "title"],
+        "properties": {
+          "key": {"type": "string"},
+          "company": {"type": "string"},
+          "title": {"type": "string"},
+          "location": {"type": "string"},
+          "start": {"type": "string"},
+          "end": {"type": "string"}
+        }
+      }
+    },
+    "bullets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "roleKey", "text", "tags"],
+        "properties": {
+          "id": {"type": "string"},
+          "roleKey": {"type": "string"},
+          "text": {"type": "string"},
+          "tags": {"type": "array", "items": {"type": "string"}},
+          "metrics": {"type": "object"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "candidate": {
+    "name": "Maurice Thomas",
+    "email": "mrthomaslmg@gmail.com",
+    "phone": "(737) 497-1806",
+    "location": "Austin, TX",
+    "links": [
+      {"label": "LinkedIn", "url": "https://www.linkedin.com/in/mrt45"},
+      {"label": "GitHub", "url": "https://github.com/dktrn9ne"}
+    ]
+  },
+  "skills": {
+    "Languages": ["TypeScript", "JavaScript", "Python", "SQL"],
+    "Frontend": ["React", "HTML", "CSS"],
+    "DB": ["PostgreSQL (Supabase)", "MySQL/MariaDB"],
+    "Dev": ["API integration", "Debugging", "Automation scripting"],
+    "Tools": ["Git/GitHub"],
+    "Platforms": ["Windows", "Linux (hands-on)"]
+  },
+  "roles": [
+    {"key": "library_labs", "company": "Library Labs", "title": "AI Media / Automation / Software Development", "location": "Remote", "start": "2023", "end": "Present"},
+    {"key": "meta_ads_policy", "company": "Meta (Facebook)", "title": "Ads Policy Advisor", "location": "Austin, TX / Remote", "start": "2016", "end": "2018"}
+  ],
+  "bullets": [
+    {"id": "tech_labs_1", "roleKey": "library_labs", "text": "Shipped web projects and internal tooling using React, TypeScript/JavaScript, HTML/CSS, and Python.", "tags": ["react", "typescript", "python", "web"]},
+    {"id": "tech_labs_2", "roleKey": "library_labs", "text": "Built structured logging/metrics endpoints and operational dashboards; improved reliability with safe-by-default controls.", "tags": ["observability", "metrics", "reliability"]},
+    {"id": "tech_labs_3", "roleKey": "library_labs", "text": "Wrote SQL for data validation/reporting across PostgreSQL (Supabase) and MySQL/MariaDB; used HeidiSQL and phpMyAdmin.", "tags": ["sql", "supabase", "mariadb"]},
+    {"id": "tech_labs_4", "roleKey": "library_labs", "text": "Debugged production issues end-to-end: reproduce, isolate root cause, implement fixes, validate outcomes, and document changes.", "tags": ["debugging", "support", "docs"]},
+
+    {"id": "tech_meta_1", "roleKey": "meta_ads_policy", "text": "Operated in high-volume workflows requiring rigorous documentation and stakeholder communication; handled escalations under deadlines.", "tags": ["communication", "process", "stakeholders"]}
+  ]
+}
