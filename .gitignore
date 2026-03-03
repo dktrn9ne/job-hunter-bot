@@ -1,7 +1,17 @@
 node_modules/
 .env
+
+# local data
+apps/bot/data/
 *.sqlite
 *.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# build output
+apps/bot/dist/
+
+# generated docs
 *.pdf
 /out/
 /dist/
