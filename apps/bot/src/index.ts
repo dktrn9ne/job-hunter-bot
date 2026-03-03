@@ -14,6 +14,9 @@ const env = {
   MATCH_THRESHOLD: Number(process.env.MATCH_THRESHOLD || '75'),
   CHROME_PATH: process.env.CHROME_PATH || '',
 
+  // API auth
+  BOT_API_TOKEN: process.env.BOT_API_TOKEN || '',
+
   BASE_RESUME_MUSIC: process.env.BASE_RESUME_MUSIC || '',
   BASE_RESUME_TECH: process.env.BASE_RESUME_TECH || '',
   BASE_RESUME_MARKETING: process.env.BASE_RESUME_MARKETING || '',
@@ -26,6 +29,18 @@ const env = {
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
+
+function requireAuth(req: express.Request, res: express.Response): boolean {
+  // If token not set, run open (dev). For tunnel/prod, set BOT_API_TOKEN.
+  if (!env.BOT_API_TOKEN) return true;
+  const h = req.header('authorization') || '';
+  const ok = h.toLowerCase().startsWith('bearer ') && h.slice(7).trim() === env.BOT_API_TOKEN;
+  if (!ok) {
+    res.status(401).json({ ok: false, error: 'unauthorized' });
+    return false;
+  }
+  return true;
+}
 
 const db = openDb(env.DATA_DIR);
 
@@ -46,6 +61,7 @@ const ingestSchema = z.object({
 });
 
 app.post('/jobs/ingest', (req, res) => {
+  if (!requireAuth(req, res)) return;
   const parsed = ingestSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
 
@@ -72,6 +88,7 @@ app.post('/jobs/ingest', (req, res) => {
 
 // v1 scoring: simple keyword overlap + heuristics. We'll upgrade later.
 app.post('/jobs/:id/score', (req, res) => {
+  if (!requireAuth(req, res)) return;
   const jobId = req.params.id;
   const row = db.prepare('SELECT * FROM jobs WHERE id=?').get(jobId) as any;
   if (!row) return res.status(404).json({ ok: false, error: 'not_found' });
@@ -105,6 +122,7 @@ const generateSchema = z.object({
 });
 
 app.post('/jobs/:id/generate', async (req, res) => {
+  if (!requireAuth(req, res)) return;
   const jobId = req.params.id;
   const parsed = generateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
@@ -167,6 +185,7 @@ const emailApplySchema = z.object({
 });
 
 app.post('/apply/email', async (req, res) => {
+  if (!requireAuth(req, res)) return;
   const parsed = emailApplySchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
 
@@ -203,7 +222,8 @@ app.post('/apply/email', async (req, res) => {
   return res.json({ ok: true });
 });
 
-app.get('/jobs', (_req, res) => {
+app.get('/jobs', (req, res) => {
+  if (!requireAuth(req, res)) return;
   const rows = db.prepare('SELECT * FROM jobs ORDER BY created_at DESC LIMIT 200').all();
   res.json({ ok: true, jobs: rows });
 });
