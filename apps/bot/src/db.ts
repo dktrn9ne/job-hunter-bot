@@ -30,10 +30,18 @@ export function openDb(dataDir: string) {
       title TEXT,
       location TEXT,
       jd_text TEXT,
+      track TEXT,
+      base_resume TEXT,
+      notes TEXT,
+      comp_listed TEXT,
+      comp_market_austin TEXT,
       match_score INTEGER,
       match_reason TEXT,
       status TEXT NOT NULL
     );
+
+    -- lightweight migrations (ok if columns already exist)
+    -- (SQLite doesn't support IF NOT EXISTS for ALTER COLUMN; we guard by try/catch in code)
 
     CREATE TABLE IF NOT EXISTS documents (
       id TEXT PRIMARY KEY,

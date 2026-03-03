@@ -51,16 +51,20 @@ function id(prefix: string) {
   return `${prefix}_${crypto.randomBytes(12).toString('hex')}`;
 }
 
-const ingestSchema = z.object({
-  sourceUrl: z.string().url().optional(),
-  platform: z.enum(['linkedin','indeed','ziprecruiter','upwork','other']).default('other'),
-  company: z.string().optional(),
-  title: z.string().optional(),
-  location: z.string().optional(),
-  jdText: z.string().optional()
-}).refine((v) => (v.jdText && v.jdText.trim().length >= 50) || !!v.sourceUrl, {
-  message: 'Provide either jdText (>= 50 chars) or sourceUrl'
-});
+const ingestSchema = z
+  .object({
+    sourceUrl: z.string().url().optional(),
+    platform: z.enum(["linkedin", "indeed", "ziprecruiter", "upwork", "other"]).default("other"),
+    track: z.enum(["TECH", "MARKETING", "PROCESS_TECH"]).optional(),
+    baseResume: z.enum(["music", "tech", "marketing"]).optional(),
+    company: z.string().optional(),
+    title: z.string().optional(),
+    location: z.string().optional(),
+    jdText: z.string().optional(),
+  })
+  .refine((v) => (v.jdText && v.jdText.trim().length >= 50) || !!v.sourceUrl, {
+    message: "Provide either jdText (>= 50 chars) or sourceUrl",
+  });
 
 app.post('/jobs/ingest', (req, res) => {
   if (!requireAuth(req, res)) return;
@@ -69,9 +73,16 @@ app.post('/jobs/ingest', (req, res) => {
 
   const jobId = id('job');
   const ts = nowIso();
+  // best-effort migrations for existing sqlite
+  try { db.prepare('ALTER TABLE jobs ADD COLUMN track TEXT').run(); } catch {}
+  try { db.prepare('ALTER TABLE jobs ADD COLUMN base_resume TEXT').run(); } catch {}
+  try { db.prepare('ALTER TABLE jobs ADD COLUMN notes TEXT').run(); } catch {}
+  try { db.prepare('ALTER TABLE jobs ADD COLUMN comp_listed TEXT').run(); } catch {}
+  try { db.prepare('ALTER TABLE jobs ADD COLUMN comp_market_austin TEXT').run(); } catch {}
+
   db.prepare(`
-    INSERT INTO jobs (id, created_at, updated_at, source_url, platform, company, title, location, jd_text, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO jobs (id, created_at, updated_at, source_url, platform, company, title, location, jd_text, track, base_resume, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).run(
     jobId,
     ts,
@@ -82,6 +93,8 @@ app.post('/jobs/ingest', (req, res) => {
     parsed.data.title || null,
     parsed.data.location || null,
     parsed.data.jdText || null,
+    parsed.data.track || null,
+    parsed.data.baseResume || null,
     'NEW'
   );
 
@@ -119,14 +132,16 @@ app.post('/jobs/:id/score', (req, res) => {
   return res.json({ ok: true, score, threshold: env.MATCH_THRESHOLD, reason, pass: score >= env.MATCH_THRESHOLD });
 });
 
-const generateSchema = z.object({
-  base: z.enum(['music','tech','marketing']),
+const tailorSchema = z.object({
+  base: z.enum(["music", "tech", "marketing"]),
+  track: z.enum(["TECH", "MARKETING", "PROCESS_TECH"]).optional(),
 });
 
-app.post('/jobs/:id/generate', async (req, res) => {
+// Tailor (v1): copies base HTML as-is. v2 will apply a deterministic tailoring pipeline.
+app.post('/jobs/:id/tailor', async (req, res) => {
   if (!requireAuth(req, res)) return;
   const jobId = req.params.id;
-  const parsed = generateSchema.safeParse(req.body);
+  const parsed = tailorSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
 
   const row = db.prepare('SELECT * FROM jobs WHERE id=?').get(jobId) as any;
@@ -137,24 +152,29 @@ app.post('/jobs/:id/generate', async (req, res) => {
   const outDir = path.resolve(env.DATA_DIR, 'out', jobId);
   fs.mkdirSync(outDir, { recursive: true });
 
-  // v1: copy base HTML as-is; later we will tailor sections/bullets via templates.
-  const baseMap: Record<string,string> = {
+  // v1: copy base HTML as-is; v2 will tailor sections/bullets via templates + fact-bank.
+  const baseMap: Record<string, string> = {
     music: env.BASE_RESUME_MUSIC,
     tech: env.BASE_RESUME_TECH,
-    marketing: env.BASE_RESUME_MARKETING
+    marketing: env.BASE_RESUME_MARKETING,
   };
 
   const basePath = baseMap[parsed.data.base];
   if (!basePath || !fs.existsSync(basePath)) {
-    return res.status(500).json({ ok: false, error: `base_resume_missing:${parsed.data.base}` });
+    return res
+      .status(500)
+      .json({ ok: false, error: `base_resume_missing:${parsed.data.base}` });
   }
 
   const resumeHtmlPath = path.join(outDir, `resume_${parsed.data.base}.html`);
   fs.copyFileSync(basePath, resumeHtmlPath);
 
-  // v1 cover letter: placeholder; later generated per job.
+  // cover letters are now on-demand (separate endpoint). For compatibility, we still create a placeholder.
   const coverHtmlPath = path.join(outDir, 'cover.html');
-  fs.writeFileSync(coverHtmlPath, `<html><body style="font-family:Arial"><h2>Maurice Thomas — Cover Letter</h2><p>Re: ${row.title || 'Role'}</p><p>Dear Hiring Manager,</p><p>(Draft generated in v1; will be tailored in v2.)</p><p>Sincerely,<br/>Maurice Thomas</p></body></html>`);
+  fs.writeFileSync(
+    coverHtmlPath,
+    `<html><body style="font-family:Arial"><h2>Maurice Thomas — Cover Letter</h2><p>Re: ${row.title || 'Role'}</p><p>Dear Hiring Manager,</p><p>(Cover letters are generated on-demand in v2.)</p><p>Sincerely,<br/>Maurice Thomas</p></body></html>`
+  );
 
   const resumePdfPath = path.join(outDir, `resume_${parsed.data.base}.pdf`);
   const coverPdfPath = path.join(outDir, 'cover.pdf');
@@ -172,11 +192,27 @@ app.post('/jobs/:id/generate', async (req, res) => {
 
   const docId = id('doc');
   const ts = nowIso();
-  db.prepare(`INSERT INTO documents (id, job_id, created_at, base_resume, resume_html_path, resume_pdf_path, cover_html_path, cover_pdf_path)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(docId, jobId, ts, parsed.data.base, resumeHtmlPath, resumePdfPath, coverHtmlPath, coverPdfPath);
+  db.prepare(
+    `INSERT INTO documents (id, job_id, created_at, base_resume, resume_html_path, resume_pdf_path, cover_html_path, cover_pdf_path)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  ).run(
+    docId,
+    jobId,
+    ts,
+    parsed.data.base,
+    resumeHtmlPath,
+    resumePdfPath,
+    coverHtmlPath,
+    coverPdfPath
+  );
 
-  db.prepare('UPDATE jobs SET status=?, updated_at=? WHERE id=?').run('GENERATED', ts, jobId);
+  db.prepare('UPDATE jobs SET status=?, updated_at=?, base_resume=?, track=? WHERE id=?').run(
+    'GENERATED',
+    ts,
+    parsed.data.base,
+    parsed.data.track || row.track || null,
+    jobId
+  );
 
   return res.json({ ok: true, docId, resumePdfPath, coverPdfPath });
 });
@@ -188,6 +224,8 @@ const emailApplySchema = z.object({
 
 app.post('/apply/email', async (req, res) => {
   if (!requireAuth(req, res)) return;
+  // NOTE: cover letter generation is on-demand; apply will attach latest generated cover.pdf present in documents.
+
   const parsed = emailApplySchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
 

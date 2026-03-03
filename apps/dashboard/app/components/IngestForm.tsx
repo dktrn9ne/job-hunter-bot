@@ -8,6 +8,13 @@ export function IngestForm() {
   const [platform, setPlatform] = useState<
     "linkedin" | "indeed" | "ziprecruiter" | "upwork" | "other"
   >("other");
+
+  const [track, setTrack] = useState<"TECH" | "MARKETING" | "PROCESS_TECH">(
+    "MARKETING"
+  );
+  const [baseResume, setBaseResume] = useState<
+    "music" | "tech" | "marketing"
+  >("marketing");
   const [company, setCompany] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
@@ -21,6 +28,8 @@ export function IngestForm() {
     try {
       const payload: any = {
         platform,
+        track,
+        baseResume,
         company: company || undefined,
         title: title || undefined,
         location: location || undefined,
@@ -85,7 +94,7 @@ export function IngestForm() {
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="mt-3 grid grid-cols-1 md:grid-cols-5 gap-3">
         <div>
           <label className="block text-xs font-semibold text-zinc-700">
             Company (optional)
@@ -115,6 +124,32 @@ export function IngestForm() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-zinc-700">Track</label>
+          <select
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            value={track}
+            onChange={(e) => setTrack(e.target.value as any)}
+          >
+            <option value="MARKETING">Marketing</option>
+            <option value="TECH">Tech</option>
+            <option value="PROCESS_TECH">Process Tech</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-semibold text-zinc-700">
+            Base Resume
+          </label>
+          <select
+            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            value={baseResume}
+            onChange={(e) => setBaseResume(e.target.value as any)}
+          >
+            <option value="marketing">Marketing</option>
+            <option value="tech">Tech</option>
+            <option value="music">Music</option>
+          </select>
         </div>
       </div>
 

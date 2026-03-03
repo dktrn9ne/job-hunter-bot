@@ -1,5 +1,7 @@
 import { IngestForm } from "./components/IngestForm";
 
+import { TailorButton } from "./components/TailorButton";
+
 type JobRow = {
   id: string;
   created_at: string;
@@ -11,6 +13,8 @@ type JobRow = {
   match_score?: number | null;
   status: string;
   match_reason?: string | null;
+  track?: "TECH" | "MARKETING" | "PROCESS_TECH" | null;
+  base_resume?: "music" | "tech" | "marketing" | null;
 };
 
 async function fetchJobs(): Promise<JobRow[]> {
@@ -67,6 +71,7 @@ export default async function Home() {
                 <th className="p-3">Score</th>
                 <th className="p-3">Status</th>
                 <th className="p-3">Created</th>
+                <th className="p-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -98,6 +103,13 @@ export default async function Home() {
                     <td className="p-3 whitespace-nowrap">{j.status}</td>
                     <td className="p-3 whitespace-nowrap">
                       {new Date(j.created_at).toLocaleString()}
+                    </td>
+                    <td className="p-3 whitespace-nowrap">
+                      <TailorButton
+                        jobId={j.id}
+                        base={(j.base_resume ?? "marketing") as any}
+                        track={(j.track ?? undefined) as any}
+                      />
                     </td>
                   </tr>
                 ))
