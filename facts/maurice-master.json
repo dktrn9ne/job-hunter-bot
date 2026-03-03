@@ -1,0 +1,437 @@
+{
+  "person": {
+    "name": "Maurice Thomas",
+    "location": {
+      "city": "Austin",
+      "state": "TX",
+      "postal_code_variants": [
+        "78701"
+      ]
+    },
+    "contact": {
+      "phone": "(737) 497-1806",
+      "email": "mrthomaslmg@gmail.com",
+      "linkedin": "linkedin.com/in/mrt45",
+      "github": "github.com/dktrn9ne",
+      "portfolio_sites": [
+        "myspace-resume.vercel.app"
+      ]
+    },
+    "work_authorization_notes": {
+      "open_to_hybrid_or_in_office": true,
+      "open_to_relocate": true,
+      "in_person_ready": true
+    },
+    "languages": [
+      {
+        "language": "Spanish",
+        "proficiency": "conversational"
+      }
+    ]
+  },
+  "certifications_and_credentials": [
+    {
+      "name": "Valid Driver’s License"
+    },
+    {
+      "name": "DOT Medical Card"
+    },
+    {
+      "name": "Forklift Certified"
+    },
+    {
+      "name": "TABC Certified"
+    }
+  ],
+  "targets": [
+    {
+      "target_title": "Programmer IV",
+      "focus": [
+        "Application Development",
+        "Automation",
+        "Production Support"
+      ]
+    },
+    {
+      "target_title": "Content Producer (AI-First)",
+      "focus": [
+        "Video + Writing",
+        "Content Operations",
+        "Project Management"
+      ]
+    },
+    {
+      "target_title": "Marketing Manager",
+      "focus": [
+        "Digital Advertising",
+        "Content & Social",
+        "Website Management",
+        "CRM/Retargeting"
+      ]
+    },
+    {
+      "target_title": "Senior Process Technician",
+      "focus": [
+        "Wafer Fab / Cleanroom",
+        "Lithography",
+        "Wet Etch / Dry Etch",
+        "Metrology",
+        "Tool Discipline"
+      ]
+    },
+    {
+      "target_title": "Off-Premise Sales & Merchandising (Beverage Distribution)",
+      "focus": [
+        "Account Growth",
+        "In-Store Execution",
+        "Route/Delivery Support"
+      ]
+    }
+  ],
+  "professional_summaries": [
+    {
+      "track": "Off-premise beverage sales & merchandising",
+      "highlights": [
+        "Experience across Mexcor, Local Libations, and multi-stop route operations throughout Central Texas",
+        "In-store execution: product visibility, displays, resets, stocking/facing, rotation (FIFO)",
+        "Safety-first; zero-accident record; equipment experience (pallet jack, hand truck, lift gate, box truck, 26-ft truck)"
+      ]
+    },
+    {
+      "track": "Software development & automation",
+      "highlights": [
+        "Builds/supports production workflows and internal tools using TypeScript/JavaScript, Python, HTML/CSS, and SQL (PostgreSQL/MySQL/MariaDB)",
+        "Debugging, issue triage, documentation, iterative delivery; stakeholder collaboration",
+        "Process discipline from high-compliance and high-volume environments"
+      ]
+    },
+    {
+      "track": "Content/marketing operations (AI-first)",
+      "highlights": [
+        "7+ years across editorial publishing, entertainment/media campaigns, and AI-driven production workflows",
+        "End-to-end content: ideation → scripting → production/edit coordination → publishing → reporting",
+        "Outcomes: supported a YouTube campaign reaching 4.1M+ views; supported marketing for an Amazon Best Seller (History of Gangster Rap)"
+      ]
+    },
+    {
+      "track": "Marketing & digital campaigns",
+      "highlights": [
+        "Performance marketing across Meta Ads and Google Ads; Meta Pixel retargeting and lookalike audiences",
+        "Managed $40K–$100K annual marketing budgets; disciplined reporting (sales, traffic, engagement, subscriber metrics)",
+        "Web execution: WordPress + Shopify site management; YouTube publishing and growth"
+      ]
+    },
+    {
+      "track": "Semiconductor cleanroom / wafer processing",
+      "highlights": [
+        "Hands-on cleanroom experience supporting lithography, photoresist coating, wet etch, dry etch, chamber cleans, and CD metrology",
+        "Strong tool discipline, SOP adherence, documentation habits, and EHS/chemical safety mindset",
+        "Escalates exceptions/yield concerns; collaborates with engineers/tool owners on troubleshooting and continuous improvement"
+      ]
+    }
+  ],
+  "skills": {
+    "sales_and_merchandising": [
+      "New account outreach",
+      "Relationship building",
+      "Territory support",
+      "Product visibility",
+      "Displays",
+      "Resets",
+      "Stocking/facing",
+      "Rotation (FIFO)",
+      "Planogram alignment",
+      "Backroom organization",
+      "Inventory accuracy"
+    ],
+    "delivery_and_route": [
+      "Efficient routing",
+      "Multi-stop delivery",
+      "On-time performance",
+      "Proof of delivery (POD)",
+      "Exception handling",
+      "Delivery documentation"
+    ],
+    "marketing_and_content": [
+      "Content calendars/briefs/approvals",
+      "Versioning and deadlines",
+      "Copywriting/editing",
+      "Scripting and narrative structure",
+      "Short-form and long-form video production coordination",
+      "YouTube distribution and growth",
+      "Engagement tracking and performance reporting",
+      "Meta Ads",
+      "Google Ads",
+      "Meta Pixel retargeting",
+      "Lookalike audiences"
+    ],
+    "software_and_automation": [
+      "TypeScript",
+      "JavaScript",
+      "Python",
+      "HTML",
+      "CSS",
+      "React",
+      "SQL (PostgreSQL via Supabase, MySQL/MariaDB)",
+      "API integration",
+      "Debugging/issue triage",
+      "Automation scripting",
+      "Git/GitHub",
+      "CLI tooling",
+      "Documentation and change discipline"
+    ],
+    "semiconductor_manufacturing": [
+      "Full gowning / contamination control",
+      "5S / particle awareness",
+      "Photoresist coating",
+      "Recipe discipline",
+      "Wet etch",
+      "Dry etch",
+      "Chamber cleans",
+      "CD metrology and inspection",
+      "Run sheets/logbooks and traceability",
+      "EHS: PPE, chemical handling, waste stream compliance"
+    ],
+    "equipment": [
+      "Pallet jack",
+      "Hand truck",
+      "Lift gate",
+      "Box truck",
+      "26-ft truck",
+      "Forklift"
+    ],
+    "tools_general": [
+      "Microsoft Office (Excel/Word)",
+      "Email communication",
+      "WordPress",
+      "Shopify",
+      "GitHub/Vercel deployment literacy"
+    ]
+  },
+  "experience": [
+    {
+      "company": "Library Labs",
+      "title": "AI Media Generation / Software Development / Automation",
+      "location": "Remote",
+      "dates": {
+        "start_year": 2023,
+        "end_year": null
+      },
+      "details": [
+        "Built and automated production workflows to improve repeatability and reduce manual overhead",
+        "Full-stack development and rapid prototyping (React, TypeScript/JavaScript, HTML/CSS, Python)",
+        "Supported debugging and iterative improvements with documentation, validation, and change coordination"
+      ]
+    },
+    {
+      "company": "Toppan Photomasks",
+      "title": "Lithography / Dry Etch Technician",
+      "location": "Round Rock, TX",
+      "dates": {
+        "start_year": 2019,
+        "end_year": 2023
+      },
+      "details": [
+        "Executed quality-controlled procedures in a high-compliance manufacturing environment with strong documentation discipline",
+        "Supported lithography (photoresist coating), wet etch, dry etch; maintained SOP/recipe discipline and contamination-control practices",
+        "Performed chamber cleans; supported troubleshooting with engineers/tool owners",
+        "Performed CD metrology/inspection checks; recorded results and flagged out-of-spec conditions",
+        "Handled chemicals and high-vacuum/high-temperature equipment per EHS requirements"
+      ]
+    },
+    {
+      "company": "Meta (Facebook)",
+      "title": "Policy Advisor / Ads Policy Advisor",
+      "location": "Austin, TX / Remote",
+      "dates": {
+        "start_year": 2016,
+        "end_year": 2018
+      },
+      "details": [
+        "Supported high-volume operational workflows with escalations, cross-functional coordination, and rigorous documentation",
+        "Advised on advertising policy; supported ad operations workflows including issue triage/escalations",
+        "Used ad testing credits to validate creative/targeting approaches and troubleshoot delivery issues; translated findings into guidance"
+      ]
+    },
+    {
+      "company": "Orange Line Media",
+      "title": "Marketing / Content Campaigns",
+      "location": "Unique Access / Soren Baker Books",
+      "dates": {
+        "start_year": 2016,
+        "end_year": 2020
+      },
+      "details": [
+        "Planned and executed multi-channel content and marketing campaigns; coordinated messaging, creative assets, publishing cadence, and reporting",
+        "Led/managed paid media across Meta Ads and Google Ads; retargeting and lookalike strategy",
+        "Managed annual budgets in the $40K–$100K range; tracked KPIs (book sales, web traffic, engagement)",
+        "Supported marketing for 'History of Gangster Rap' (Soren Baker), an Amazon Best Seller"
+      ]
+    },
+    {
+      "company": "Lamorne Morris",
+      "title": "Video Marketing Campaign (\"33 Savage\")",
+      "location": null,
+      "dates": {
+        "start_year": 2017,
+        "end_year": 2017
+      },
+      "details": [
+        "Executed promotional strategy and distribution; YouTube campaign reached 4.1M+ views",
+        "Coordinated rollout assets and posting cadence; monitored views/subscribers/engagement to guide iteration"
+      ]
+    },
+    {
+      "company": "Cheri Media",
+      "title": "Intern / Staff Writer",
+      "location": "Remote (HipHopDX referenced)",
+      "dates": {
+        "start_year": 2014,
+        "end_year": 2015
+      },
+      "details": [
+        "Wrote and edited content on deadline",
+        "Supported publishing cadence, quality checks, editorial workflows",
+        "Assisted content promotion/distribution through web and social channels"
+      ]
+    },
+    {
+      "company": "GRM",
+      "title": "Driver / Document Courier",
+      "location": "Central Texas",
+      "dates": {
+        "start_year": 2023,
+        "end_year": null
+      },
+      "details": [
+        "Time-sensitive document pickup and delivery; confidentiality, accuracy, professional service",
+        "Managed routing, delivery documentation, and exception handling for on-time completion"
+      ]
+    },
+    {
+      "company": "Amazon",
+      "title": "Delivery Driver",
+      "location": "Central Texas",
+      "dates": {
+        "start_year": 2017,
+        "end_year": 2023
+      },
+      "details": [
+        "Delivered packages on multi-stop routes; productivity, safety, and customer service",
+        "Loaded/unloaded vehicle; navigated dynamic routing changes; maintained delivery accuracy",
+        "Resolved delivery issues (access, incorrect addresses, customer availability)"
+      ]
+    },
+    {
+      "company": "Local Libations",
+      "title": "Beverage Delivery / Merchandising",
+      "location": "Central Texas",
+      "dates": {
+        "start_year": 2015,
+        "end_year": 2016
+      },
+      "details": [
+        "Serviced off-premise accounts; maintained store relationships and reliable in-store execution",
+        "Improved visibility with stocking/facing, FIFO rotation, planogram-aligned displays",
+        "Executed resets and display refreshes; safe unloading/backroom organization using pallet jack/hand truck and lift gate"
+      ]
+    },
+    {
+      "company": "Mexcor",
+      "title": "Off-Premise Merchandising / Delivery Support",
+      "location": "Central Texas",
+      "dates": {
+        "start_year": 2014,
+        "end_year": 2015
+      },
+      "details": [
+        "Supported beverage distribution and merchandising; stocking, facing, display maintenance to brand standards",
+        "Consistent store visits, communication, and execution aligned to business priorities",
+        "Followed safety procedures handling product, pallets, and backroom inventory organization"
+      ]
+    }
+  ],
+  "projects_and_accolades": [
+    {
+      "name": "Consensus 2023 — Buidlbox Hackathon Winner",
+      "project": "Himitsu (Wanchain)"
+    },
+    {
+      "name": "Consensus 2024 — Hackathon Winner",
+      "project": "Meme Coin Lottery"
+    },
+    {
+      "name": "Fresh-dashboard",
+      "type": "GitHub project",
+      "tech": [
+        "TypeScript"
+      ],
+      "link": "github.com/dktrn9ne/Fresh-dashboard"
+    }
+  ],
+  "education": [
+    {
+      "institution": "Round Rock High School",
+      "credential": "High School Diploma",
+      "location": "Round Rock, TX"
+    },
+    {
+      "institution": "Santa Monica College",
+      "credential_variants": [
+        "Associate Degree (major/year not confirmed)",
+        "Computer Science (coursework; no degree listed)",
+        "Media Studies (2014–2015)"
+      ]
+    }
+  ],
+  "proclamation": {
+    "document_type": "City Proclamation",
+    "title_text": "Proclamation",
+    "subject": "DKTR N9NE Day",
+    "person_named": "Maurice Thomas (also known as the Rhythm & Blues recording artist DKTR N9NE)",
+    "issuing_authority": {
+      "name": "Steve Adler",
+      "role": "Mayor of the City of Austin, Texas"
+    },
+    "date_proclaimed": "2018-02-06",
+    "key_statements_paraphrased": [
+      "Recognizes meaningful music contributions to thousands of Austinites and others in the Austin community",
+      "Notes appearances at culturally historic venues such as The Victory Grill",
+      "Notes writing songs for multi-platinum producers and work featuring artists from emerging local to internationally renowned",
+      "States accolades and accomplishments exemplify cultural excellence associated with the City of Austin"
+    ],
+    "formal_closing_paraphrased": "In witness whereof, the Mayor set his hand and caused the seal of the City of Austin to be affixed on February 6, 2018."
+  },
+  "source_documents": [
+    {
+      "filename": "Maurice_Thomas_Mexcor_Austin_Off_Premise_Sales_Pro_ATS.pdf",
+      "type": "Resume",
+      "primary_focus": "Off-premise beverage sales/merchandising + delivery/route operations"
+    },
+    {
+      "filename": "Maurice_Thomas_TCEQ_Programmer_IV_ATS_v2.pdf",
+      "type": "Resume",
+      "primary_focus": "Programmer IV / application development / automation / production support"
+    },
+    {
+      "filename": "Maurice_Thomas_Sonar_Content_Producer_AI_First_ATS.pdf",
+      "type": "Resume",
+      "primary_focus": "Content producer (AI-first) / content ops / video + writing"
+    },
+    {
+      "filename": "Maurice_Thomas_Lamborghini_Austin_Marketing_Manager_ATS_v3.pdf",
+      "type": "Resume",
+      "primary_focus": "Marketing manager / paid media / web + content execution"
+    },
+    {
+      "filename": "Maurice_Thomas_Senior_Process_Technician_WaferFab_ATS.pdf",
+      "type": "Resume",
+      "primary_focus": "Senior process technician / wafer fab cleanroom manufacturing"
+    },
+    {
+      "filename": "IMG_1461.jpg",
+      "type": "Proclamation image",
+      "primary_focus": "City of Austin proclamation establishing 'DKTR N9NE Day' on Feb 6, 2018"
+    }
+  ]
+}
