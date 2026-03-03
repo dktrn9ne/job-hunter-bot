@@ -1,3 +1,5 @@
+import { IngestForm } from "./components/IngestForm";
+
 type JobRow = {
   id: string;
   created_at: string;
@@ -49,6 +51,10 @@ export default async function Home() {
               </span>
             )}
           </div>
+        </div>
+
+        <div className="mb-6">
+          <IngestForm />
         </div>
 
         <div className="overflow-x-auto rounded-lg border bg-white">

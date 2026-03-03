@@ -52,12 +52,14 @@ function id(prefix: string) {
 }
 
 const ingestSchema = z.object({
-  sourceUrl: z.string().optional(),
+  sourceUrl: z.string().url().optional(),
   platform: z.enum(['linkedin','indeed','ziprecruiter','upwork','other']).default('other'),
   company: z.string().optional(),
   title: z.string().optional(),
   location: z.string().optional(),
-  jdText: z.string().min(50)
+  jdText: z.string().optional()
+}).refine((v) => (v.jdText && v.jdText.trim().length >= 50) || !!v.sourceUrl, {
+  message: 'Provide either jdText (>= 50 chars) or sourceUrl'
 });
 
 app.post('/jobs/ingest', (req, res) => {
@@ -79,7 +81,7 @@ app.post('/jobs/ingest', (req, res) => {
     parsed.data.company || null,
     parsed.data.title || null,
     parsed.data.location || null,
-    parsed.data.jdText,
+    parsed.data.jdText || null,
     'NEW'
   );
 
