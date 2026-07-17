@@ -24,7 +24,7 @@ const env = {
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || '',
   MAIL_FROM: process.env.MAIL_FROM || '',
   MAIL_FROM_NAME: process.env.MAIL_FROM_NAME || 'Maurice Thomas',
-  APPLY_EMAIL_SUBJECT: process.env.APPLY_EMAIL_SUBJECT || 'Application: {{title}} — Maurice Thomas'
+  APPLY_EMAIL_SUBJECT: process.env.APPLY_EMAIL_SUBJECT || 'Application: {{title}} - Maurice Thomas'
 };
 
 const app = express();
@@ -73,13 +73,6 @@ app.post('/jobs/ingest', (req, res) => {
 
   const jobId = id('job');
   const ts = nowIso();
-  // best-effort migrations for existing sqlite
-  try { db.prepare('ALTER TABLE jobs ADD COLUMN track TEXT').run(); } catch {}
-  try { db.prepare('ALTER TABLE jobs ADD COLUMN base_resume TEXT').run(); } catch {}
-  try { db.prepare('ALTER TABLE jobs ADD COLUMN notes TEXT').run(); } catch {}
-  try { db.prepare('ALTER TABLE jobs ADD COLUMN comp_listed TEXT').run(); } catch {}
-  try { db.prepare('ALTER TABLE jobs ADD COLUMN comp_market_austin TEXT').run(); } catch {}
-
   db.prepare(`
     INSERT INTO jobs (id, created_at, updated_at, source_url, platform, company, title, location, jd_text, track, base_resume, status)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -173,7 +166,7 @@ app.post('/jobs/:id/tailor', async (req, res) => {
   const coverHtmlPath = path.join(outDir, 'cover.html');
   fs.writeFileSync(
     coverHtmlPath,
-    `<html><body style="font-family:Arial"><h2>Maurice Thomas — Cover Letter</h2><p>Re: ${row.title || 'Role'}</p><p>Dear Hiring Manager,</p><p>(Cover letters are generated on-demand in v2.)</p><p>Sincerely,<br/>Maurice Thomas</p></body></html>`
+    `<html><body style="font-family:Arial"><h2>Maurice Thomas - Cover Letter</h2><p>Re: ${row.title || 'Role'}</p><p>Dear Hiring Manager,</p><p>(Cover letters are generated on-demand in v2.)</p><p>Sincerely,<br/>Maurice Thomas</p></body></html>`
   );
 
   const resumePdfPath = path.join(outDir, `resume_${parsed.data.base}.pdf`);

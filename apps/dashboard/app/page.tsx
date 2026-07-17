@@ -1,7 +1,10 @@
 import { IngestForm } from "./components/IngestForm";
-
 import { TailorButton } from "./components/TailorButton";
 import { DocLinks } from "./components/DocLinks";
+import { botAuthHeaders, getBotApiConfig } from "./lib/botApi";
+
+type Track = "TECH" | "MARKETING" | "PROCESS_TECH";
+type BaseResume = "music" | "tech" | "marketing";
 
 type JobRow = {
   id: string;
@@ -14,19 +17,17 @@ type JobRow = {
   match_score?: number | null;
   status: string;
   match_reason?: string | null;
-  track?: "TECH" | "MARKETING" | "PROCESS_TECH" | null;
-  base_resume?: "music" | "tech" | "marketing" | null;
+  track?: Track | null;
+  base_resume?: BaseResume | null;
 };
 
 async function fetchJobs(): Promise<JobRow[]> {
-  const base = process.env.NEXT_PUBLIC_BOT_API_URL;
-  if (!base) return [];
+  const config = getBotApiConfig();
+  if ("error" in config) return [];
 
-  const res = await fetch(`${base.replace(/\/$/, "")}/jobs`, {
+  const res = await fetch(`${config.base}/jobs`, {
     cache: "no-store",
-    headers: process.env.NEXT_PUBLIC_BOT_API_TOKEN
-      ? { Authorization: `Bearer ${process.env.NEXT_PUBLIC_BOT_API_TOKEN}` }
-      : undefined,
+    headers: botAuthHeaders(config.token),
   });
 
   if (!res.ok) return [];
@@ -34,109 +35,195 @@ async function fetchJobs(): Promise<JobRow[]> {
   return json.jobs ?? [];
 }
 
+function statCount(jobs: JobRow[], statuses: string[]) {
+  return jobs.filter((job) => statuses.includes(job.status)).length;
+}
+
+function avgScore(jobs: JobRow[]) {
+  const scores = jobs
+    .map((job) => job.match_score)
+    .filter((score): score is number => typeof score === "number");
+
+  if (scores.length === 0) return "-";
+  return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
+function statusClass(status: string) {
+  if (status === "APPLIED_EMAIL" || status === "APPLIED_WEB") return "tag-accent";
+  if (status === "INTERVIEW" || status === "OFFER") return "tag-accent-2";
+  if (status === "GENERATED" || status === "READY_TO_SUBMIT") return "tag-outline";
+  return "tag-neutral";
+}
+
+function statusLabel(status: string) {
+  return status.replaceAll("_", " ").toLowerCase();
+}
+
 export default async function Home() {
   const jobs = await fetchJobs();
+  const config = getBotApiConfig();
+  const applied = statCount(jobs, ["APPLIED_EMAIL", "APPLIED_WEB"]);
+  const interviews = statCount(jobs, ["INTERVIEW"]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6 font-sans text-zinc-900">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Job Hunter Dashboard</h1>
-            <p className="text-sm text-zinc-600">
-              Applied / interviews / yays / nays (v1)
-            </p>
-          </div>
-          <div className="text-sm text-zinc-600">
-            {process.env.NEXT_PUBLIC_BOT_API_URL ? (
-              <span>Bot API: {process.env.NEXT_PUBLIC_BOT_API_URL}</span>
-            ) : (
-              <span className="font-semibold text-red-600">
-                Set NEXT_PUBLIC_BOT_API_URL in Vercel env
-              </span>
-            )}
-          </div>
-        </div>
+    <main>
+      <nav className="nav" aria-label="Primary navigation">
+        <span className="nav-brand">CAREER PIPELINE</span>
+        <a href="#pipeline" aria-current="page">
+          Pipeline
+        </a>
+        <a href="#ingest">Add</a>
+        <a href="#roadmap">Roadmap</a>
+        <span className="tag tag-outline bot-status">
+          <span aria-hidden="true">*</span>
+          {"base" in config ? "SERVICE ONLINE" : "SERVICE OFFLINE"}
+        </span>
+      </nav>
 
-        <div className="mb-6">
+      <div className="page">
+        <section className="stats-grid" aria-label="Pipeline statistics">
+          <div className="stat-cell">
+            <div className="stat-kicker">Total tracked</div>
+            <div className="stat-num">{jobs.length}</div>
+          </div>
+          <div className="stat-cell">
+            <div className="stat-kicker">Applied</div>
+            <div className="stat-num accent-text">{applied}</div>
+          </div>
+          <div className="stat-cell">
+            <div className="stat-kicker">Interviews</div>
+            <div className="stat-num">{interviews}</div>
+          </div>
+          <div className="stat-cell">
+            <div className="stat-kicker">Avg score</div>
+            <div className="stat-num accent-text">{avgScore(jobs)}</div>
+          </div>
+        </section>
+
+        <hr className="hr" />
+
+        <section id="ingest" className="ingest-block" aria-labelledby="ingest-title">
+          <div className="sec-title">
+            <h1 id="ingest-title">Add opportunity</h1>
+          </div>
           <IngestForm />
-        </div>
+        </section>
 
-        <div className="overflow-x-auto rounded-lg border bg-white">
-          <table className="w-full text-sm">
-            <thead className="bg-zinc-50">
-              <tr className="text-left">
-                <th className="p-3">Company</th>
-                <th className="p-3">Title</th>
-                <th className="p-3">Platform</th>
-                <th className="p-3">Score</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Created</th>
-                <th className="p-3">Actions / Docs</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.length === 0 ? (
-                <tr>
-                  <td className="p-3 text-zinc-600" colSpan={6}>
-                    No jobs yet (or dashboard can’t reach the bot API).
-                  </td>
-                </tr>
-              ) : (
-                jobs.map((j) => (
-                  <tr key={j.id} className="border-t">
-                    <td className="p-3 whitespace-nowrap">{j.company ?? "—"}</td>
-                    <td className="p-3 min-w-[360px]">
-                      <div className="font-medium">{j.title ?? "—"}</div>
-                      {j.source_url ? (
-                        <a
-                          className="text-blue-600 hover:underline"
-                          href={j.source_url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          View posting
+        <hr className="hr" />
+
+        <section id="pipeline" aria-labelledby="pipeline-title">
+          <div className="sec-title">
+            <h2 id="pipeline-title">Active pipeline</h2>
+            <span className="count">{jobs.length} records</span>
+          </div>
+
+          <div className="job-list">
+            {jobs.length === 0 ? (
+              <div className="empty-state">
+                <div className="card-title">No opportunities tracked yet</div>
+                <p className="card-body">
+                  Add a job description or posting URL above to start building the pipeline.
+                </p>
+              </div>
+            ) : (
+              jobs.map((job) => {
+                const score = job.match_score ?? 0;
+                const hasScore = typeof job.match_score === "number";
+
+                return (
+                  <article className="job-row" key={job.id}>
+                    <div className="job-main">
+                      <div className="job-role">{job.title ?? "Untitled role"}</div>
+                      <div className="job-company">
+                        {job.company ?? "Unknown company"}
+                        {job.platform ? (
+                          <>
+                            {" "}
+                            / <span className="tag tag-neutral">{job.platform}</span>
+                          </>
+                        ) : null}
+                      </div>
+                      {job.source_url ? (
+                        <a href={job.source_url} target="_blank" rel="noreferrer">
+                          VIEW POSTING
                         </a>
                       ) : null}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">{j.platform ?? "—"}</td>
-                    <td className="p-3 whitespace-nowrap">{j.match_score ?? "—"}</td>
-                    <td className="p-3 whitespace-nowrap">{j.status}</td>
-                    <td className="p-3 whitespace-nowrap">
-                      {new Date(j.created_at).toLocaleString()}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">
-                      <div className="flex flex-col gap-2">
-                        <TailorButton
-                          jobId={j.id}
-                          base={(j.base_resume ?? "marketing") as any}
-                          track={(j.track ?? undefined) as any}
-                        />
-                        <DocLinks
-                          jobId={j.id}
-                          base={(j.base_resume ?? "marketing") as any}
+                    </div>
+
+                    <div className="score-row" aria-label={`Match score ${score}`}>
+                      <div className="score-bar">
+                        <div
+                          className={hasScore && score >= 75 ? "score-fill" : "score-fill muted"}
+                          style={{ width: `${Math.min(100, Math.max(0, score))}%` }}
                         />
                       </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                      <span
+                        className={hasScore && score >= 75 ? "score-value strong" : "score-value"}
+                      >
+                        {hasScore ? score : "-"}
+                      </span>
+                    </div>
 
-        <div className="mt-6 text-sm text-zinc-600">
-          <div className="font-semibold">Next improvements</div>
-          <ul className="list-disc pl-5">
-            <li>
-              ATS scoring v2: structured keyword matching + must-have gating +
-              track-specific weights
-            </li>
-            <li>Auth token on bot API endpoints</li>
-            <li>Status updates + interview scheduling + yays/nays</li>
-          </ul>
-        </div>
+                    <div className={`tag ${statusClass(job.status)} status-badge`}>
+                      {statusLabel(job.status)}
+                    </div>
+
+                    <div className="job-date">{formatDate(job.created_at)}</div>
+
+                    <div className="job-actions">
+                      <TailorButton
+                        jobId={job.id}
+                        base={job.base_resume ?? "marketing"}
+                        track={job.track ?? undefined}
+                      />
+                      <DocLinks jobId={job.id} base={job.base_resume ?? "marketing"} />
+                    </div>
+                  </article>
+                );
+              })
+            )}
+          </div>
+        </section>
+
+        <hr className="hr" />
+
+        <section id="roadmap" aria-labelledby="roadmap-title">
+          <div className="sec-title">
+            <h2 id="roadmap-title">Next improvements</h2>
+          </div>
+          <div className="roadmap-grid">
+            <div className="roadmap-cell">
+              <div className="tag tag-outline">PLANNED</div>
+              <div className="card-title">Smarter scoring</div>
+              <p className="card-body">
+                Structured keyword matching, must-have gating and role-specific weights.
+              </p>
+            </div>
+            <div className="roadmap-cell">
+              <div className="tag tag-outline">PLANNED</div>
+              <div className="card-title">Status tracking</div>
+              <p className="card-body">
+                Interview scheduling, offer/rejection tracking and a pipeline analytics view.
+              </p>
+            </div>
+            <div className="roadmap-cell">
+              <div className="tag tag-outline">PLANNED</div>
+              <div className="card-title">Cover letter templates</div>
+              <p className="card-body">
+                On-demand tailored generation using reusable candidate profile data.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

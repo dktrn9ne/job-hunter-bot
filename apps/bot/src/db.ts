@@ -65,5 +65,24 @@ export function openDb(dataDir: string) {
     );
   `);
 
+  for (const statement of [
+    'ALTER TABLE jobs ADD COLUMN track TEXT',
+    'ALTER TABLE jobs ADD COLUMN base_resume TEXT',
+    'ALTER TABLE jobs ADD COLUMN notes TEXT',
+    'ALTER TABLE jobs ADD COLUMN comp_listed TEXT',
+    'ALTER TABLE jobs ADD COLUMN comp_market_austin TEXT'
+  ]) {
+    try {
+      db.prepare(statement).run();
+    } catch {
+      // Column already exists on current databases.
+    }
+  }
+
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_jobs_created_at ON jobs(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_documents_job_created ON documents(job_id, created_at DESC);
+  `);
+
   return db;
 }
