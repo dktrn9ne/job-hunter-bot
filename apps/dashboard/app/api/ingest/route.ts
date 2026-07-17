@@ -1,28 +1,16 @@
 import { NextResponse } from "next/server";
+import { botApiConfigError, botAuthHeaders, getBotApiConfig } from "../../lib/botApi";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const botBase = process.env.NEXT_PUBLIC_BOT_API_URL;
-  const token = process.env.NEXT_PUBLIC_BOT_API_TOKEN;
+  const config = getBotApiConfig();
+  if ("error" in config) return botApiConfigError(config.error);
 
-  if (!botBase) {
-    return NextResponse.json(
-      { ok: false, error: "NEXT_PUBLIC_BOT_API_URL_missing" },
-      { status: 500 }
-    );
-  }
-  if (!token) {
-    return NextResponse.json(
-      { ok: false, error: "NEXT_PUBLIC_BOT_API_TOKEN_missing" },
-      { status: 500 }
-    );
-  }
-
-  const res = await fetch(`${botBase.replace(/\/$/, "")}/jobs/ingest`, {
+  const res = await fetch(`${config.base}/jobs/ingest`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...botAuthHeaders(config.token),
     },
     body: JSON.stringify(body),
   });

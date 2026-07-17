@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { botApiConfigError, botAuthHeaders, getBotApiConfig } from "../../lib/botApi";
 
 function contentTypeFor(kind: string) {
   if (kind.endsWith(".pdf")) return "application/pdf";
@@ -18,28 +19,13 @@ export async function GET(req: Request) {
     );
   }
 
-  const botBase = process.env.NEXT_PUBLIC_BOT_API_URL;
-  const token = process.env.NEXT_PUBLIC_BOT_API_TOKEN;
+  const config = getBotApiConfig();
+  if ("error" in config) return botApiConfigError(config.error);
 
-  if (!botBase) {
-    return NextResponse.json(
-      { ok: false, error: "NEXT_PUBLIC_BOT_API_URL_missing" },
-      { status: 500 }
-    );
-  }
-  if (!token) {
-    return NextResponse.json(
-      { ok: false, error: "NEXT_PUBLIC_BOT_API_TOKEN_missing" },
-      { status: 500 }
-    );
-  }
-
-  const target = `${botBase.replace(/\/$/, "")}/jobs/${jobId}/docs/${encodeURIComponent(
-    kind
-  )}`;
+  const target = `${config.base}/jobs/${jobId}/docs/${encodeURIComponent(kind)}`;
 
   const res = await fetch(target, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: botAuthHeaders(config.token),
     cache: "no-store",
   });
 

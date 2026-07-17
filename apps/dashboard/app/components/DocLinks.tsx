@@ -1,42 +1,39 @@
-export function DocLinks(props: { jobId: string; base: "music" | "tech" | "marketing" }) {
-  const { jobId, base } = props;
+export function DocLinks({
+  jobId,
+  base,
+}: {
+  jobId: string;
+  base: "music" | "tech" | "marketing";
+}) {
   const resumeHtmlKind = `resume_${base}.html`;
   const resumePdfKind = `resume_${base}.pdf`;
 
   return (
-    <div className="flex flex-col gap-1 text-xs">
+    <div className="doc-links">
       <a
-        className="text-blue-600 hover:underline"
         href={`/api/docs?jobId=${encodeURIComponent(jobId)}&kind=${encodeURIComponent(
           resumeHtmlKind
         )}`}
         target="_blank"
         rel="noreferrer"
       >
-        View resume (HTML)
+        RES.HTML
       </a>
       <a
-        className="text-blue-600 hover:underline"
         href={`/api/docs?jobId=${encodeURIComponent(jobId)}&kind=${encodeURIComponent(
           resumePdfKind
         )}`}
       >
-        Download resume (PDF)
+        RES.PDF
       </a>
       <a
-        className="text-blue-600 hover:underline"
         href={`/api/docs?jobId=${encodeURIComponent(jobId)}&kind=cover.html`}
         target="_blank"
         rel="noreferrer"
       >
-        View cover (HTML)
+        CVR.HTML
       </a>
-      <a
-        className="text-blue-600 hover:underline"
-        href={`/api/docs?jobId=${encodeURIComponent(jobId)}&kind=cover.pdf`}
-      >
-        Download cover (PDF)
-      </a>
+      <a href={`/api/docs?jobId=${encodeURIComponent(jobId)}&kind=cover.pdf`}>CVR.PDF</a>
     </div>
   );
 }

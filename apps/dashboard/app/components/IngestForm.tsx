@@ -2,23 +2,34 @@
 
 import { useState } from "react";
 
+type Platform = "linkedin" | "indeed" | "ziprecruiter" | "upwork" | "other";
+type Track = "TECH" | "MARKETING" | "PROCESS_TECH";
+type BaseResume = "music" | "tech" | "marketing";
+
+type IngestPayload = {
+  platform: Platform;
+  track: Track;
+  baseResume: BaseResume;
+  company?: string;
+  title?: string;
+  location?: string;
+  sourceUrl?: string;
+  jdText?: string;
+};
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export function IngestForm() {
   const [sourceUrl, setSourceUrl] = useState("");
   const [jdText, setJdText] = useState("");
-  const [platform, setPlatform] = useState<
-    "linkedin" | "indeed" | "ziprecruiter" | "upwork" | "other"
-  >("other");
-
-  const [track, setTrack] = useState<"TECH" | "MARKETING" | "PROCESS_TECH">(
-    "MARKETING"
-  );
-  const [baseResume, setBaseResume] = useState<
-    "music" | "tech" | "marketing"
-  >("marketing");
+  const [platform, setPlatform] = useState<Platform>("other");
+  const [track, setTrack] = useState<Track>("MARKETING");
+  const [baseResume, setBaseResume] = useState<BaseResume>("marketing");
   const [company, setCompany] = useState("");
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
-
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -26,7 +37,7 @@ export function IngestForm() {
     setBusy(true);
     setMsg(null);
     try {
-      const payload: any = {
+      const payload: IngestPayload = {
         platform,
         track,
         baseResume,
@@ -52,38 +63,35 @@ export function IngestForm() {
         setCompany("");
         setTitle("");
         setLocation("");
-        // refresh page data
         window.location.reload();
       }
-    } catch (e: any) {
-      setMsg(`Error: ${e?.message ?? String(e)}`);
+    } catch (e: unknown) {
+      setMsg(`Error: ${errorMessage(e)}`);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="rounded-lg border bg-white p-4">
-      <div className="flex flex-col md:flex-row md:items-end gap-3">
-        <div className="flex-1">
-          <label className="block text-xs font-semibold text-zinc-700">
-            Job URL (optional)
-          </label>
+    <div>
+      <div className="form-grid form-row-2">
+        <div className="field">
+          <label htmlFor="job-url">JOB URL (OPTIONAL)</label>
           <input
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="job-url"
+            className="input"
             value={sourceUrl}
             onChange={(e) => setSourceUrl(e.target.value)}
-            placeholder="https://..."
+            placeholder="https://linkedin.com/jobs/..."
           />
         </div>
-        <div className="w-full md:w-48">
-          <label className="block text-xs font-semibold text-zinc-700">
-            Platform
-          </label>
+        <div className="field">
+          <label htmlFor="platform">PLATFORM</label>
           <select
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="platform"
+            className="input"
             value={platform}
-            onChange={(e) => setPlatform(e.target.value as any)}
+            onChange={(e) => setPlatform(e.target.value as Platform)}
           >
             <option value="linkedin">LinkedIn</option>
             <option value="indeed">Indeed</option>
@@ -94,90 +102,81 @@ export function IngestForm() {
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 md:grid-cols-5 gap-3">
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700">
-            Company (optional)
-          </label>
+      <div className="form-grid form-row-5">
+        <div className="field">
+          <label htmlFor="company">COMPANY</label>
           <input
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="company"
+            className="input"
             value={company}
             onChange={(e) => setCompany(e.target.value)}
+            placeholder="Company name"
           />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700">
-            Title (optional)
-          </label>
+        <div className="field">
+          <label htmlFor="title">ROLE TITLE</label>
           <input
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="title"
+            className="input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="Product Manager"
           />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700">
-            Location (optional)
-          </label>
+        <div className="field">
+          <label htmlFor="location">LOCATION</label>
           <input
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="location"
+            className="input"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            placeholder="Remote, New York, NY"
           />
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700">Track</label>
+        <div className="field">
+          <label htmlFor="track">TRACK</label>
           <select
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="track"
+            className="input"
             value={track}
-            onChange={(e) => setTrack(e.target.value as any)}
+            onChange={(e) => setTrack(e.target.value as Track)}
           >
-            <option value="MARKETING">Marketing</option>
-            <option value="TECH">Tech</option>
-            <option value="PROCESS_TECH">Process Tech</option>
+            <option value="MARKETING">Business / Growth</option>
+            <option value="TECH">Technical</option>
+            <option value="PROCESS_TECH">Operations</option>
           </select>
         </div>
-        <div>
-          <label className="block text-xs font-semibold text-zinc-700">
-            Base Resume
-          </label>
+        <div className="field">
+          <label htmlFor="base-resume">RESUME PROFILE</label>
           <select
-            className="mt-1 w-full rounded border px-3 py-2 text-sm"
+            id="base-resume"
+            className="input"
             value={baseResume}
-            onChange={(e) => setBaseResume(e.target.value as any)}
+            onChange={(e) => setBaseResume(e.target.value as BaseResume)}
           >
-            <option value="marketing">Marketing</option>
-            <option value="tech">Tech</option>
-            <option value="music">Music</option>
+            <option value="marketing">General</option>
+            <option value="tech">Technical</option>
+            <option value="music">Creative</option>
           </select>
         </div>
       </div>
 
-      <div className="mt-3">
-        <label className="block text-xs font-semibold text-zinc-700">
-          Job description (optional if URL provided)
-        </label>
+      <div className="field jd-field">
+        <label htmlFor="job-description">JOB DESCRIPTION (PASTE FULL TEXT - REQUIRED IF NO URL)</label>
         <textarea
-          className="mt-1 w-full rounded border px-3 py-2 text-sm min-h-[140px]"
+          id="job-description"
+          className="input"
           value={jdText}
           onChange={(e) => setJdText(e.target.value)}
-          placeholder="Paste the full job description here (recommended for LinkedIn/Upwork)."
+          placeholder="Paste the complete job description here for best matching results..."
         />
-        <div className="mt-1 text-xs text-zinc-500">
-          Requirement: either a URL or JD text (50+ chars). For LinkedIn/Upwork,
-          paste the JD text.
-        </div>
       </div>
 
-      <div className="mt-3 flex items-center gap-3">
-        <button
-          onClick={submit}
-          disabled={busy}
-          className="rounded bg-black px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-        >
-          {busy ? "Adding…" : "Add Job"}
+      <div className="form-actions">
+        <button onClick={submit} disabled={busy} className="btn btn-primary">
+          {busy ? "Adding..." : "Add opportunity"}
         </button>
-        {msg ? <div className="text-sm text-zinc-700">{msg}</div> : null}
+        {msg ? <div className="form-message">{msg}</div> : null}
       </div>
     </div>
   );

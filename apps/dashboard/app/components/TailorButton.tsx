@@ -2,7 +2,15 @@
 
 import { useState } from "react";
 
-export function TailorButton(props: {
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+export function TailorButton({
+  jobId,
+  base,
+  track,
+}: {
   jobId: string;
   base: "music" | "tech" | "marketing";
   track?: "TECH" | "MARKETING" | "PROCESS_TECH";
@@ -17,32 +25,28 @@ export function TailorButton(props: {
       const res = await fetch("/api/tailor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId: props.jobId, base: props.base, track: props.track }),
+        body: JSON.stringify({ jobId, base, track }),
       });
       const json = await res.json();
       if (!res.ok || !json.ok) {
         setMsg(`Error: ${json?.error ?? res.status}`);
       } else {
-        setMsg("Tailored ✔");
+        setMsg("Tailored");
         window.location.reload();
       }
-    } catch (e: any) {
-      setMsg(`Error: ${e?.message ?? String(e)}`);
+    } catch (e: unknown) {
+      setMsg(`Error: ${errorMessage(e)}`);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={run}
-        disabled={busy}
-        className="rounded bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
-      >
-        {busy ? "Tailoring…" : "Tailor"}
+    <div className="tailor-control">
+      <button onClick={run} disabled={busy} className="btn btn-secondary tailor-btn">
+        {busy ? "TAILORING..." : "TAILOR"}
       </button>
-      {msg ? <span className="text-xs text-zinc-600">{msg}</span> : null}
+      {msg ? <span className="tailor-message">{msg}</span> : null}
     </div>
   );
 }
