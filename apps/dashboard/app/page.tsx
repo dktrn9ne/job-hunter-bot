@@ -25,14 +25,23 @@ async function fetchJobs(): Promise<JobRow[]> {
   const config = getBotApiConfig();
   if ("error" in config) return [];
 
-  const res = await fetch(`${config.base}/jobs`, {
-    cache: "no-store",
-    headers: botAuthHeaders(config.token),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${config.base}/jobs`, {
+      cache: "no-store",
+      headers: botAuthHeaders(config.token),
+    });
+  } catch (error) {
+    console.warn("[dashboard] bot API unavailable", {
+      base: config.base,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return [];
+  }
 
   if (!res.ok) return [];
-  const json = await res.json();
-  return json.jobs ?? [];
+  const json = await res.json().catch(() => null);
+  return json?.jobs ?? [];
 }
 
 function statCount(jobs: JobRow[], statuses: string[]) {
