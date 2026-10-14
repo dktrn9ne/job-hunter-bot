@@ -122,7 +122,7 @@ app.post('/jobs/:id/score', (req, res) => {
   db.prepare('UPDATE jobs SET match_score=?, match_reason=?, status=?, updated_at=? WHERE id=?')
     .run(score, reason, 'SCORED', ts, jobId);
 
-  return res.json({ ok: true, score, threshold: env.MATCH_THRESHOLD, reason, pass: score >= env.MATCH_THRESHOLD });
+  return res.json({ ok: true, score, threshold: env.MATCH_THRESHOLD, reason, pass: false, decision: 'review', score_kind: 'keyword_overlap', review_reasons: ['Keyword overlap does not establish eligibility; provide a current posting-to-proof map.'] });
 });
 
 const tailorSchema = z.object({
@@ -207,7 +207,7 @@ app.post('/jobs/:id/tailor', async (req, res) => {
     jobId
   );
 
-  return res.json({ ok: true, docId, resumePdfPath, coverPdfPath });
+  return res.json({ ok: true, docId, resumePdfPath, coverPdfPath, tailoring_status: 'base_copy', review_required: true, warning: 'Base resume copied unchanged; cover letter is a placeholder. These materials are not ready for submission.' });
 });
 
 const emailApplySchema = z.object({
@@ -227,6 +227,8 @@ app.post('/apply/email', async (req, res) => {
 
   const doc = db.prepare('SELECT * FROM documents WHERE job_id=? ORDER BY created_at DESC LIMIT 1').get(parsed.data.jobId) as any;
   if (!doc) return res.status(400).json({ ok: false, error: 'no_documents_generated' });
+
+  if (fs.readFileSync(doc.cover_html_path, 'utf8').includes('Cover letters are generated on-demand in v2.')) return res.status(409).json({ ok: false, error: 'placeholder_materials_not_ready', message: 'Replace and review placeholder materials before submitting.' });
 
   if (!env.SENDGRID_API_KEY) return res.status(500).json({ ok: false, error: 'SENDGRID_API_KEY_missing' });
   if (!env.MAIL_FROM) return res.status(500).json({ ok: false, error: 'MAIL_FROM_missing' });
