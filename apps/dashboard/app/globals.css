@@ -99,6 +99,9 @@ input:focus, textarea:focus { border-color: #62a88b; box-shadow: 0 0 0 4px var(-
 .evidence-list article div { display: grid; align-content: start; gap: 4px; }
 .evidence-list article strong { font-size: 12px; }
 .evidence-list article span { color: var(--muted); font-size: 11px; }
+.evidence-list article a { color: var(--green); font-size: 11px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.source-note { display: block; margin-top: 12px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+.source-note.repository { color: #396b57; }
 .result-actions { display: flex; align-items: center; gap: 18px; margin-top: 28px; }
 .result-actions button.secondary { flex: 0 0 auto; border: 1px solid var(--ink); background: transparent; color: var(--ink); }
 

@@ -20,6 +20,15 @@ describe("ATS analysis", () => {
     });
     expect(result.matchedTerms).toEqual(expect.arrayContaining(["TypeScript", "React", "Python"]));
     expect(result.summary).toContain("verified capabilities");
+    expect(result.evidence.every((item) => item.source.url.startsWith("https://"))).toBe(true);
+  });
+
+  it("distinguishes repository artifacts from candidate-authored portfolio evidence", () => {
+    const result = analyzeJob({
+      ...base,
+      jdText: "Build Python evaluation systems with deterministic tests, controls, JSON evidence, CI release gates, agent workflows, API integration, documentation, and failure analysis for production AI products.",
+    });
+    expect(result.evidence.some((item) => item.source.kind === "repository")).toBe(true);
   });
 
   it("flags hard requirements that are not verified", () => {

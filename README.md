@@ -11,6 +11,8 @@ CheckChaser is a private, evidence-based workspace for evaluating job fit and pr
 
 The Vercel application performs deterministic ATS analysis in a Node.js route handler. It does not submit applications, send email, or claim that unconfigured services are online. In preview mode, job descriptions and results are not persisted.
 
+Evidence records include provenance. Public repositories and reproducible CI artifacts are labeled as implementation evidence; `mauricethomas.online` is labeled as a candidate-authored portfolio source and does not independently prove employment, awards, adoption metrics, or third-party recognition.
+
 ## Local validation
 
 ```bash

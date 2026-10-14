@@ -9,7 +9,12 @@ type Analysis = {
   missingTerms: string[];
   risks: string[];
   summary: string;
-  evidence: Array<{ company: string; title: string; bullets: string[] }>;
+  evidence: Array<{
+    company: string;
+    title: string;
+    bullets: string[];
+    source: { label: string; url: string; kind: "portfolio" | "repository" };
+  }>;
   metadata: { analyzedAt: string; mode: string };
 };
 
@@ -118,8 +123,19 @@ export function AtsWorkspace() {
               <div className="section-heading"><div><span className="step">Step 2</span><h2>Tailoring evidence</h2></div></div>
               {analysis.evidence.map((item) => (
                 <article key={`${item.company}-${item.title}`}>
-                  <div><strong>{item.title}</strong><span>{item.company}</span></div>
-                  <ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>
+                  <div>
+                    <strong>{item.title}</strong>
+                    <span>{item.company}</span>
+                    <a href={item.source.url} target="_blank" rel="noreferrer">
+                      {item.source.kind === "repository" ? "Artifact evidence" : "Portfolio source"} ↗
+                    </a>
+                  </div>
+                  <div>
+                    <ul>{item.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}</ul>
+                    <small className={`source-note ${item.source.kind}`}>
+                      {item.source.label}. Portfolio sources are candidate-authored; repository artifacts provide stronger implementation evidence.
+                    </small>
+                  </div>
                 </article>
               ))}
             </div>

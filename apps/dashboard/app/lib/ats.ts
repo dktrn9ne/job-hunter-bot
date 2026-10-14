@@ -76,10 +76,18 @@ export function analyzeJob(input: z.infer<typeof analysisInputSchema>) {
     .map((role) => ({ role, score: roleScore(role, jdTokens) }))
     .sort((left, right) => right.score - left.score)
     .slice(0, 3)
-    .map(({ role }) => ({ company: role.company, title: `${role.title} · ${role.years}`, bullets: role.bullets }));
+    .map(({ role }) => ({
+      company: role.company,
+      title: `${role.title} · ${role.years}`,
+      bullets: role.bullets,
+      source: role.source,
+    }));
 
   const skillCoverage = matched.length / Math.max(8, Math.min(18, matched.length + missing.length));
-  const evidenceStrength = evidence.reduce((total, item) => total + roleScore({ ...item, years: "" }, jdTokens), 0);
+  const evidenceStrength = evidence.reduce(
+    (total, item) => total + roleScore({ ...item, years: "" }, jdTokens),
+    0,
+  );
   const score = Math.max(20, Math.min(96, Math.round(32 + skillCoverage * 52 + Math.min(12, evidenceStrength) - risks.length * 4)));
   const verdict = score >= 78 && risks.length <= 1 ? "STRONG_MATCH" : score >= 58 ? "REVIEW" : "GAP";
 
