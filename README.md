@@ -1,33 +1,50 @@
-# job-hunter-bot (v1)
+# CheckChaser
 
-Safe-by-default job hunter bot:
-- Ingest job URLs/JDs
-- Match-score (apply only if >= 75)
-- Generate tailored resume + cover letter PDFs from HTML bases
-- Auto-apply only for **apply-by-email** (SendGrid)
-- Queue web-form applications for human review
+CheckChaser is a private, evidence-based workspace for evaluating job fit and preparing truthful resume-tailoring briefs.
 
-## Local setup
+## Current architecture
 
-### Requirements
-- Node.js 18+ (22 ok)
-- Google Chrome (for PDF generation)
+- `apps/dashboard` — canonical Next.js 16 application for Vercel
+- `apps/bot` — legacy local Express service retained for migration reference; it is not used by the Vercel application
+- `facts` — verified candidate source material; server-side use only
+- `policies` — application safety and approval rules
 
-### Configure
-Copy `.env.example` to `.env` and fill values locally.
+The Vercel application performs deterministic ATS analysis in a Node.js route handler. It does not submit applications, send email, or claim that unconfigured services are online. In preview mode, job descriptions and results are not persisted.
 
-### Run
+## Local validation
+
 ```bash
-cd apps/bot
-npm i
-npm run dev
+cd apps/dashboard
+npm ci
+npm run lint
+npm test
+npm run build
 ```
 
-Bot API runs on `http://127.0.0.1:8787` by default.
+Use Node.js 24, matching the Vercel project runtime.
 
-## Notes
-- Do not store secrets in git.
-- Web-form auto-submission is intentionally NOT included in v1.
+## Environment variables
+
+Copy `.env.example` to `.env.local` only when enabling an integration. Never use `NEXT_PUBLIC_` for credentials.
+
+- `DATABASE_URL` — durable application and approval records
+- `BLOB_READ_WRITE_TOKEN` — generated document storage
+- `CHECKCHASER_APPROVAL_SECRET` — server-side approval verification
+- `CRON_SECRET` — authenticated scheduled maintenance
+- `SENDGRID_API_KEY`, `MAIL_FROM`, `MAIL_FROM_NAME` — optional outbound email after approval
+
+## Deployment policy
+
+1. Deploy changes to a preview branch.
+2. Validate the UI, `/api/health`, and `/api/analyze`.
+3. Require human review of generated evidence and qualification warnings.
+4. Provision database, Blob, auth, and durable workflows before enabling persistence or document generation.
+5. Never promote a preview to production without explicit approval.
+
+## Security note
+
+The repository previously contained a committed API token placeholder that resembled a live secret. Rotate any credential that may have used that value and keep the repository private because verified candidate records contain personal data.
 
 ## Evidence context contract
-Read `context/domain_rules.md` and `context/table_guide.md` before running this workflow. Mandatory qualifications need requirement-to-proof records; unknowns stay in review. Deterministic checks validate structure, not source truth or model accuracy.
+
+Read `context/domain_rules.md` and `context/table_guide.md` before running the policy workflow. Mandatory qualifications need requirement-to-proof records; unknowns stay in review. Deterministic checks validate structure, not source truth or model accuracy.
