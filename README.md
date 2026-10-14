@@ -102,4 +102,9 @@ The bot reads environment variables including `MATCH_THRESHOLD`, `CHROME_PATH`, 
 
 ## Portfolio focus
 
-This repository models a real workflow, separates the API and review interface, preserves state, generates usable artifacts, and limits automation where human judgment remains important.
+## Notes
+- Do not store secrets in git.
+- Web-form auto-submission is intentionally NOT included in v1.
+
+## Evidence context contract
+Read `context/domain_rules.md` and `context/table_guide.md` before running this workflow. Mandatory qualifications need requirement-to-proof records; unknowns stay in review. Deterministic checks validate structure, not source truth or model accuracy.
