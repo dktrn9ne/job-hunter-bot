@@ -28,3 +28,6 @@ Bot API runs on `http://127.0.0.1:8787` by default.
 ## Notes
 - Do not store secrets in git.
 - Web-form auto-submission is intentionally NOT included in v1.
+
+## Evidence context contract
+Read `context/domain_rules.md` and `context/table_guide.md` before running this workflow. Mandatory qualifications need requirement-to-proof records; unknowns stay in review. Deterministic checks validate structure, not source truth or model accuracy.
