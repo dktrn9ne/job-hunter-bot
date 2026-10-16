@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { z } from 'zod';
 
+import { installApprovalService } from './approval.js';
+import { fileURLToPath } from 'node:url';
 import { openDb } from './db.js';
 import { htmlToPdf } from './pdf.js';
 import { initSendgrid, sendApplyEmail } from './sendgrid.js';
@@ -23,8 +25,7 @@ const env = {
 
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || '',
   MAIL_FROM: process.env.MAIL_FROM || '',
-  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME || 'Maurice Thomas',
-  APPLY_EMAIL_SUBJECT: process.env.APPLY_EMAIL_SUBJECT || 'Application: {{title}} - Maurice Thomas'
+  MAIL_FROM_NAME: process.env.MAIL_FROM_NAME || 'Maurice Thomas'
 };
 
 const app = express();
@@ -210,51 +211,16 @@ app.post('/jobs/:id/tailor', async (req, res) => {
   return res.json({ ok: true, docId, resumePdfPath, coverPdfPath, tailoring_status: 'base_copy', review_required: true, warning: 'Base resume copied unchanged; cover letter is a placeholder. These materials are not ready for submission.' });
 });
 
-const emailApplySchema = z.object({
-  jobId: z.string(),
-  toEmail: z.string().email(),
-});
-
-app.post('/apply/email', async (req, res) => {
-  if (!requireAuth(req, res)) return;
-  // NOTE: cover letter generation is on-demand; apply will attach latest generated cover.pdf present in documents.
-
-  const parsed = emailApplySchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ ok: false, error: parsed.error.flatten() });
-
-  const job = db.prepare('SELECT * FROM jobs WHERE id=?').get(parsed.data.jobId) as any;
-  if (!job) return res.status(404).json({ ok: false, error: 'job_not_found' });
-
-  const doc = db.prepare('SELECT * FROM documents WHERE job_id=? ORDER BY created_at DESC LIMIT 1').get(parsed.data.jobId) as any;
-  if (!doc) return res.status(400).json({ ok: false, error: 'no_documents_generated' });
-
-  if (fs.readFileSync(doc.cover_html_path, 'utf8').includes('Cover letters are generated on-demand in v2.')) return res.status(409).json({ ok: false, error: 'placeholder_materials_not_ready', message: 'Replace and review placeholder materials before submitting.' });
-
-  if (!env.SENDGRID_API_KEY) return res.status(500).json({ ok: false, error: 'SENDGRID_API_KEY_missing' });
-  if (!env.MAIL_FROM) return res.status(500).json({ ok: false, error: 'MAIL_FROM_missing' });
-
-  initSendgrid(env.SENDGRID_API_KEY);
-
-  const resumeB64 = fs.readFileSync(doc.resume_pdf_path).toString('base64');
-  const coverB64 = fs.readFileSync(doc.cover_pdf_path).toString('base64');
-
-  const subject = env.APPLY_EMAIL_SUBJECT.replace('{{title}}', job.title || 'Role');
-  const body = `Hello,\n\nPlease find attached my resume and cover letter for ${job.title || 'the role'} at ${job.company || 'your company'}.\n\nThank you for your time and consideration.\n\nSincerely,\nMaurice Thomas\n(737) 497-1806\nmrthomaslmg@gmail.com\n`;
-
-  await sendApplyEmail({
-    from: { email: env.MAIL_FROM, name: env.MAIL_FROM_NAME },
-    to: parsed.data.toEmail,
-    subject,
-    text: body,
-    attachments: [
-      { filename: 'Maurice_Thomas_Resume.pdf', contentBase64: resumeB64, type: 'application/pdf' },
-      { filename: 'Maurice_Thomas_Cover_Letter.pdf', contentBase64: coverB64, type: 'application/pdf' }
-    ]
-  });
-
-  const ts = nowIso();
-  db.prepare('UPDATE jobs SET status=?, updated_at=? WHERE id=?').run('APPLIED_EMAIL', ts, parsed.data.jobId);
-  return res.json({ ok: true });
+installApprovalService(app, db, {
+  botToken: env.BOT_API_TOKEN,
+  candidateToken: process.env.MAURICE_APPROVAL_TOKEN || '',
+  reviewUrl: process.env.CANDIDATE_REVIEW_URL || '',
+  policy: JSON.parse(fs.readFileSync(fileURLToPath(new URL('../../../config/double-offer/maurice.policy.json', import.meta.url)), 'utf8')),
+  send: async (mail) => {
+    if (!env.SENDGRID_API_KEY || !env.MAIL_FROM) throw new Error('Mail configuration missing');
+    initSendgrid(env.SENDGRID_API_KEY);
+    await sendApplyEmail({ ...mail, from: { email: env.MAIL_FROM, name: env.MAIL_FROM_NAME } });
+  }
 });
 
 app.get('/jobs', (req, res) => {
