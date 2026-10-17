@@ -12,7 +12,7 @@ async function setup(t, overrides = {}) {
  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'approval-'));
  const db = openDb(dir); const sent = [];
  const app = express(); app.use(express.json());
- installApprovalService(app, db, { botToken: operator, candidateToken: candidate, policy, reviewUrl: 'https://review.example/approval', send: async m => { sent.push(m); }, ...overrides });
+ installApprovalService(app, db, { botToken: operator, candidateToken: candidate, policy, allowEmployerSend:true, reviewUrl: 'https://review.example/review', send: async m => { sent.push(m); }, ...overrides });
  const server = app.listen(0, '127.0.0.1'); await new Promise(r => server.once('listening',r));
  t.after(async () => { await new Promise(r => server.close(r)); db.close(); fs.rmSync(dir, {recursive:true,force:true}); });
  const html = path.join(dir,'doc.html'), pdf = path.join(dir,'doc.pdf');
@@ -129,4 +129,21 @@ test('missing candidate credentials fail closed for both roles',async t=>{
  const x=await setup(t,{candidateToken:''});
  assert.equal((await x.create()).status,401);
  assert.equal((await x.request('/approval/packages/x/decision',{},candidate)).status,401);
+});
+
+test('sending kill switch preserves approved queue and sends nothing',async t=>{
+ const x=await setup(t,{allowEmployerSend:false});const p=(await x.create()).body.package;await x.decide(p);
+ assert.equal((await x.request('/apply/email',{packageId:p.id})).status,503);
+ assert.equal(x.db.prepare('SELECT state FROM application_packages WHERE id=?').get(p.id).state,'APPROVED');assert.equal(x.sent.length,0);
+});
+test('candidate review client lists packages only with candidate authentication',async t=>{
+ const x=await setup(t);const p=(await x.create()).body.package;
+ assert.equal((await x.request('/approval/packages',undefined,operator,'GET')).status,401);
+ const list=await x.request('/approval/packages',undefined,candidate,'GET');assert.equal(list.body.packages[0].id,p.id);assert.equal(list.body.packages[0].snapshot,undefined);
+ const page=await x.request('/review',undefined,'','GET');assert.equal(page.status,200);assert.equal(page.body.includes(candidate),false);assert.equal(page.body.includes('localStorage'),false);
+ assert.equal(x.sent.length,0);
+});
+test('employment system references are rejected in messages and documents',async t=>{
+ const x=await setup(t);assert.equal((await x.create({text:'I built job-search-agent to automate my job search. Please review my attached application.'})).status,409);
+ fs.writeFileSync(x.html,'<p>'+ 'Professional experience with Double Offer OS. '.repeat(8)+'</p>');assert.equal((await x.create()).status,409);assert.equal(x.sent.length,0);
 });

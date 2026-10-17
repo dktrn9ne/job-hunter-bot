@@ -3,11 +3,12 @@ import fs from 'node:fs';
 import type Database from 'better-sqlite3';
 import type express from 'express';
 import { z } from 'zod';
+import { reviewPage } from './review.js';
 
 export const candidateId = 'maurice';
 export const approvalEmail = 'mrthomaslmg@gmail.com';
 type Mail = { to: string; subject: string; text: string; attachments: Array<{ filename: string; contentBase64: string; type: string }> };
-type Options = { candidateToken: string; botToken: string; reviewUrl: string; send: (mail: Mail) => Promise<void>; policy: any };
+type Options = { candidateToken: string; botToken: string; reviewUrl: string; allowEmployerSend?: boolean; send: (mail: Mail) => Promise<void>; policy: any };
 const hash = (value: string) => crypto.createHash('sha256').update(value).digest('hex');
 const timestamp = () => new Date().toISOString();
 export function installApprovalService(app: express.Express, db: Database.Database, opts: Options) {
@@ -51,6 +52,18 @@ export function installApprovalService(app: express.Express, db: Database.Databa
   const publicPackage = (p: any) => ({ ...p, snapshot_json: undefined, snapshot: JSON.parse(p.snapshot_json) });
   const schema = z.object({ candidateId: z.literal('maurice'), jobId: z.string().min(1), documentId: z.string().min(1), requisitionId: z.string().trim().min(1), toEmail: z.string().email(), subject: z.string().trim().min(5), text: z.string().trim().min(50) }).strict();
   const placeholder = /placeholder|\blorem ipsum\b|\bTODO\b|\bTBD\b|generated on-demand|\[insert|\{\{/i;
+  const privateContent = /double offer os|job-hunter-bot|job-search-agent/i;
+  app.get('/review', (_req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.set('Content-Security-Policy', "default-src 'none'; script-src 'sha256-" + crypto.createHash('sha256').update(reviewPage.script).digest('base64') + "'; style-src 'unsafe-inline'; connect-src 'self'; frame-src blob:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'");
+    res.type('html').send(reviewPage.html);
+  });
+  app.get('/approval/packages', (req, res) => {
+    if (!authenticated(req, res, 'candidate')) return;
+    res.set('Cache-Control', 'no-store');
+    const rows = db.prepare("SELECT id,version,state,created_at,digest,json_extract(snapshot_json,'$.company') AS company,json_extract(snapshot_json,'$.title') AS title FROM application_packages WHERE candidate_id=? ORDER BY created_at DESC LIMIT 200").all(candidateId);
+    return res.json({ packages: rows, employerSendingEnabled: opts.allowEmployerSend === true });
+  });
   app.post('/approval/packages', (req, res) => {
     if (!authenticated(req, res, 'operator')) return;
     const parsed = schema.safeParse(req.body);
@@ -63,10 +76,12 @@ export function installApprovalService(app: express.Express, db: Database.Databa
       const attachments = [['resume', doc.resume_html_path, doc.resume_pdf_path], ['cover', doc.cover_html_path, doc.cover_pdf_path]].map(([kind, htmlPath, pdfPath]) => {
         const html = fs.readFileSync(htmlPath, 'utf8');
         const pdf = fs.readFileSync(pdfPath);
+        if (privateContent.test(html)) throw new Error('private_employment_system_content');
         if (html.replace(/<[^>]*>/g, '').trim().length < 100 || placeholder.test(html) || pdf.length < 100 || !pdf.subarray(0, 5).equals(Buffer.from('%PDF-')) || placeholder.test(pdf.toString('latin1'))) throw new Error('placeholder_or_invalid_materials');
         return { filename: `Maurice_Thomas_${kind}.pdf`, contentBase64: pdf.toString('base64'), type: 'application/pdf', sourceHtml: html };
       });
       if (placeholder.test(input.text) || placeholder.test(input.subject)) throw new Error('placeholder_message');
+      if (privateContent.test(input.text) || privateContent.test(input.subject)) throw new Error('private_employment_system_content');
       const snapshot = JSON.stringify({ ...input, company: job.company, title: job.title, sourceUrl: job.source_url, attachments });
       const p = db.transaction(() => {
         if (db.prepare("SELECT 1 FROM application_packages WHERE job_id=? AND state IN ('SENDING','SUBMISSION_UNCERTAIN','SUBMITTED')").get(input.jobId)) throw new Error('submission_already_attempted');
@@ -83,6 +98,7 @@ export function installApprovalService(app: express.Express, db: Database.Databa
   });
   app.get('/approval/packages/:id', (req, res) => {
     if (!authenticated(req, res, 'candidate')) return;
+    res.set('Cache-Control', 'no-store');
     const p = get(req.params.id);
     if (!p) return res.status(404).json({ error: 'not_found' });
     return res.json({ package: publicPackage(p), audit: db.prepare('SELECT * FROM approval_audit WHERE package_id=? ORDER BY id').all(p.id) });
@@ -129,6 +145,10 @@ export function installApprovalService(app: express.Express, db: Database.Databa
   });
   app.post('/apply/email', async (req, res) => {
     if (!authenticated(req, res, 'operator')) return;
+    if (opts.allowEmployerSend !== true) {
+      audit(null, 'operator', 'submission_disabled');
+      return res.status(503).json({ error: 'employer_sending_disabled' });
+    }
     const p = get(String(req.body.packageId || ''));
     // No request-supplied recipient, body or documents can override the approved snapshot.
     if (!valid(p) || p.state !== 'APPROVED' || Object.keys(req.body).some(k => k !== 'packageId')) {

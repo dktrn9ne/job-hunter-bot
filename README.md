@@ -123,8 +123,22 @@ Provision Maurice's secret through a private channel; never put it in a notifica
 URL, browser local storage, shared dashboard configuration or repository. The separate
 candidate credential is a single-candidate authentication mechanism, not an OIDC login.
 Approval and submission endpoints fail closed when either role configuration is unsafe.
-Existing ingest/tailor/read routes retain their prior development-mode authentication.
+Ingest/tailor/read routes also fail closed unless the operator token has at least 32 characters.
 Deploy behind HTTPS with access controls and protect the SQLite database and backups.
+The current Express backend requires a durable local filesystem. Deploying only the Next.js
+dashboard to Vercel does not deploy the backend or make local SQLite durable. Do not place
+private candidate data in a static deployment or an ephemeral function filesystem.
+
+The backend now serves `/review`, a candidate review client. Enter Maurice's credential
+there over HTTPS (or trusted loopback during local validation). It stays in page memory;
+it is not embedded, logged, saved in browser storage, or supplied through a URL. The page
+lists packages, shows exact recipient/message/PDF snapshots and audit evidence, and records
+approve/reject against the digest. It has no application-send control. Existing chat queue
+packets are separate until explicitly imported into this service.
+
+`ENABLE_EMPLOYER_EMAIL_SEND` defaults to off. Only the exact value `true` enables the
+already approval-gated submission route. Keep it off during setup and scheduled preparation.
+Candidate digest notification remains a separate, explicitly triggered mail path.
 
 Operator workflow:
 

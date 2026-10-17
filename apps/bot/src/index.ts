@@ -32,10 +32,11 @@ const app = express();
 app.use(express.json({ limit: '2mb' }));
 
 function requireAuth(req: express.Request, res: express.Response): boolean {
-  // If token not set, run open (dev). For tunnel/prod, set BOT_API_TOKEN.
-  if (!env.BOT_API_TOKEN) return true;
   const h = req.header('authorization') || '';
-  const ok = h.toLowerCase().startsWith('bearer ') && h.slice(7).trim() === env.BOT_API_TOKEN;
+  const ok = env.BOT_API_TOKEN.length >= 32 && crypto.timingSafeEqual(
+    crypto.createHash('sha256').update(h).digest(),
+    crypto.createHash('sha256').update(`Bearer ${env.BOT_API_TOKEN}`).digest()
+  );
   if (!ok) {
     res.status(401).json({ ok: false, error: 'unauthorized' });
     return false;
@@ -214,6 +215,7 @@ app.post('/jobs/:id/tailor', async (req, res) => {
 installApprovalService(app, db, {
   botToken: env.BOT_API_TOKEN,
   candidateToken: process.env.MAURICE_APPROVAL_TOKEN || '',
+  allowEmployerSend: process.env.ENABLE_EMPLOYER_EMAIL_SEND === 'true',
   reviewUrl: process.env.CANDIDATE_REVIEW_URL || '',
   policy: JSON.parse(fs.readFileSync(fileURLToPath(new URL('../../../config/double-offer/maurice.policy.json', import.meta.url)), 'utf8')),
   send: async (mail) => {
